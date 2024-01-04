@@ -16,7 +16,7 @@
 
 (test 0 (p))
 
-    ; ... Infinite expansion
+    ; ... Infinite expansion ...
 
 
 ; Normal-order evaluation
