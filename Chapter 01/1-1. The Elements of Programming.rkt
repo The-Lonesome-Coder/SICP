@@ -289,3 +289,150 @@ circumference                           ; 62.831852
 (define (another>= num1 num2) (not (< num1 num2)))
 
 ; -------------------------------------------------------------------------------------------------- ;
+
+; 1.1.7 Example: Square Roots by Newton's Method
+
+#|
+    To compute square root, the most common way is to use Newton's method of successive approximation.
+    Whenever we have a guess "y" for the value of the square root of a number "x", we can perform a
+    simple manipulation to get a better guess by averaging "y" with "x / y".
+|#
+
+(define (abs number)
+    (if (< number 0)
+        (- number)
+        number))
+
+    #|
+        float abs(const float number)
+        {
+            return (number < 0) ? -number : number;
+        }
+    |#
+
+(define (average num1 num2)
+    (/ (+ num1 num2) 2))
+
+    #|
+        float average(const float num1, const float num2)
+        {
+            return (num1 + num2) / 2;
+        }
+    |#
+
+(define (improve guess number)
+    (average guess (/ number guess)))
+
+    #|
+        float improve(const float guess, const float number)
+        {
+            return average(guess, (number / 2));
+        }
+    |#
+
+(define (good-enough? guess number)
+    (< (abs (- (square guess) number)) 0.001))
+
+    #|
+        bool good_enough(const float guess, const float number)
+        {
+            return abs(square(guess) - number) < 0.001;
+        }
+    |#
+
+(define (sqrt-iter guess number)
+    (if (good-enough? guess number)
+        guess
+        (sqrt-iter (improve guess number) number)))
+
+    #|
+        float sqrt_iter(const float guess, const float number)
+        {
+            if (good_enough(guess, number))
+            {
+                return guess;
+            }
+            else
+            {
+                sqrt_iter(improve(guess, number), number);
+            }
+        }
+    |#
+
+(define (sqrt number)
+    (sqrt-iter 1.0 number))
+
+    #|
+        float sqrt(const float number)
+        {
+            return sqrt_iter(1.0, number);
+        }
+    |#
+
+(sqrt 2)
+
+; -------------------------------------------------------------------------------------------------- ;
+
+; 1.1.8 Procedures as Black-Box Abstractions
+
+#|
+    Decomposition strategy not only simply divide the program into part, it is crucial that each
+    procedure accomplishes an identifiable task that can be used as a module in defining other
+    procedures. For instance, when we define "good-enough?" in terms of "square", we are able to
+    regard "square" as a black-box.
+
+    As far as "good-enough?" is concerned, "square" is not quite a procedure but rather an abstraction
+    of a procedure, a so-called procedural abstraction.
+|#
+
+#|
+    Local names:
+    One detail of a procedure's implementation that should not matter to the user of the procedure is
+    the implementer's choice of names for the procedure's formal parameters.
+
+    A formal parameter of a procedure has a very special role in the procedure definition, in that it
+    does not matter what name the formal parameter has. Such a name is called bound variable, and we
+    say that the procedure definition binds its formal parameters.
+
+    The following procedures should not be distinguishable.
+|#
+
+(define (sqrt number)
+    (* number number))
+
+(define (sqrt x)
+    (* x x))
+
+
+#|
+    The previous procedures "improve", "good-enough?", "sqrt-iter" only clutter up the users mind,
+    they may not define any other procedure as part of another program to work together with the
+    square-root program, because "sqrt" needs it.
+
+    The problem is especially severe in the construction of large systems by many separate programmers.
+
+    For example, in the construction of a large library of numerical procedures, many numerical functions
+    are computed as successive approximations and thus might have procedures named good-enough? and
+    improve as auxiliary procedures. We could localize the sub-procedures, hiding them inside "sqrt"
+    so that "sqrt" could co-exist with other successive approximations, each having its own private
+    "good-enough?".
+
+    The below nesting of definitions are called block structure. The procedures that uses the local
+    variable "number" is by using a discipline called lexical scoping. By this discipline, we can
+    simplify the procedures defined in the block structure so it does not need to add an extra
+    arguments for them to use.
+|#
+
+(define (sqrt number)
+    (define (good-enough? guess)
+        (< (abs (- (square guess) number)) 0.00000001))
+
+    (define (improve guess)
+        (average guess (/ number guess)))
+
+    (define (sqrt-iter guess)
+        (if (good-enough? guess number)
+            guess
+            (sqrt-iter (improve guess number) number)))
+
+    (sqrt-iter 1.0))
