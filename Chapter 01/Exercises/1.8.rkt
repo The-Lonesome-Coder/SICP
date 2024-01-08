@@ -1,7 +1,5 @@
 #lang sicp
 
-(define (cube number)
-    (* number number number))
 
 (define (good-enough? previous-guess guess)
     (< (abs (/ (- guess previous-guess) guess)) 0.00000000001))
