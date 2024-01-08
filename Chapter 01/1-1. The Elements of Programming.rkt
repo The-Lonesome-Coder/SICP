@@ -397,10 +397,10 @@ circumference                           ; 62.831852
     The following procedures should not be distinguishable.
 |#
 
-(define (sqrt number)
+(define (sqrt- number)
     (* number number))
 
-(define (sqrt x)
+(define (sqrt-2 x)
     (* x x))
 
 
@@ -423,7 +423,7 @@ circumference                           ; 62.831852
     arguments for them to use.
 |#
 
-(define (sqrt number)
+(define (sqrt-3 number)
     (define (good-enough? guess)
         (< (abs (- (square guess) number)) 0.00000001))
 
